@@ -1,0 +1,29 @@
+services:
+  wildfly:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5434
+      - POSTGRES_DB=web
+      - POSTGRES_USER=akiLsuh
+      - POSTGRES_PASSWORD=admin
+
+  db:
+    image: postgres:17
+    environment:
+      - POSTGRES_DB=web
+      - POSTGRES_USER=akiLsuh
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - "5434:5434"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

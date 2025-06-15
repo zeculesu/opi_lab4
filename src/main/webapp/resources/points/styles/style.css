@@ -1,0 +1,126 @@
+@font-face {
+  font-family: 'Pacifico-Regular';
+  src: url('../../fonts/Pacifico-Regular.ttf') format('truetype');
+}
+
+* {
+  font-family: 'Pacifico-Regular', serif;
+  font-weight: normal;
+  font-size: 1.05em;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+body {
+  background-color: #EEEEEE;
+  padding: 0 20px 20px 20px;
+  color: #222831;
+}
+
+header {
+  font-size: 2.5em;
+  font-family: 'Pacifico-Regular', Serif, serif;
+  text-align: center;
+}
+
+.form-label span {
+  margin: 10px 2px 5px 2px;
+  font-size: 1.2em;
+}
+
+input {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+input.main-button {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  background-color: #EEEEEE;
+  border-radius: 7px;
+  border: 2px solid #222831;
+  margin: 0 4% 4% 2%;
+}
+
+input.main-button:hover {
+  background-color: #00ADB5;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+input[type="button"] {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  background-color: #EEEEEE;
+  border-radius: 7px;
+  border: 2px solid #222831;
+}
+
+input[type="button"].r-button {
+  margin: 0 5px 0 0;
+  width: 2em;
+  height: auto;
+}
+
+div {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-around;
+}
+
+div.input-container {
+  justify-content: flex-start;
+  margin: 10px;
+}
+
+div.input-area {
+  flex-flow: nowrap;
+}
+
+.input-area {
+  margin: 5px 10px;
+}
+
+#Y-value-message {
+  position: absolute; /* Позиционируем сообщение абсолютно */
+  top: 100%; /* Размещаем сообщение под полем ввода */
+  left: 0; /* Выравниваем по левому краю */
+  background-color: #ffcccc; /* Цвет фона для сообщения */
+  color: #cc0000; /* Цвет текста */
+  padding: 5px; /* Отступы внутри сообщения */
+  border: 1px solid #cc0000; /* Граница */
+  border-radius: 4px; /* Скругленные углы */
+  z-index: 1000; /* Убедимся, что сообщение отображается поверх других элементов */
+  white-space: nowrap; /* Предотвращаем перенос текста */
+  font-size: 12px; /* Размер шрифта */
+  margin-top: 5px; /* Отступ сверху */
+}
+
+table.main-table {
+  border-collapse: collapse;
+  margin: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+table.main-table th {
+  background: #00ADB5;
+  color: #222831;
+  padding: 15px;
+}
+
+table.main-table tr:nth-of-type(odd) {
+  background-color: #CCCCCC;
+}
+
+.green-status {
+  color: #00b509;
+}
+
+.red-status {
+  color: #b50300;
+}
+
+@media (max-width: 600px) {
+  .hide-me {
+    display: none;
+  }
+}

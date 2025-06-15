@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+
+<html lang="ru"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/jsf/html">
+
+<h:head>
+    <h:outputScript name="points/scripts/Drawer.js"/>
+    <h:outputScript>
+        window.onload = function() {
+            drawer = new Drawer();
+            drawer.drawStartImage();
+            var maxR = #{pointHandler.maxSelectedR}; // Получаем максимальное значение R
+            drawer.redrawAll(maxR); // Вызываем функцию redrawAll с максимальным значением
+            drawer.canvas.addEventListener('click', function(event) {
+            drawer.parseClick(event)
+            });
+            setInterval(checkUpdate, 6000);
+        }
+    </h:outputScript>
+
+    <link rel="stylesheet" type="text/css" href="resources/points/styles/style.css" />
+
+    <title>Лабораторная работа №3 по Веб-программированию</title>
+</h:head>
+<h:body>
+    <header>
+        <h1>Чермантиев Илья P3230, вариант 92200</h1>
+    </header>
+    <div id="main-container">
+        <div id="form-container">
+            <h:form id="form" onsubmit="return validateForm();">
+                <div class="input-container" id="X-input-container">
+                    <p:outputLabel styleClass="form-label" for="xSpinner" value="Выберите X:"/>
+                    <p:spinner id="xSpinner" styleClass="X-input input-area" value="#{pointHandler.point.x}" stepFactor="0.5" min="-4" max="4">
+                        <f:convertNumber minFractionDigits="1" maxFractionDigits="1"/>
+                        <p:ajax event="blur" update="xSpinnerTooltip"/>
+                    </p:spinner>
+                    <p:tooltip for="xSpinner" id="xSpinnerTooltip" value="Введите значение от -4 до 4" showEvent="focus" hideEvent="blur"/>
+                </div>
+                <div class="input-container" id="Y-input-container">
+                    <p:outputLabel styleClass="form-label" for="@next" value="Выберите Y:"/>
+                    <h:inputText id="Y-input"
+                                 name="Y-input"
+                                 type="text"
+                                 value="#{pointHandler.point.y}"
+                                 styleClass="Y-input input-area"
+                                 required="false"
+                                 maxlength="6"
+                                 validatorMessage="Не входит в [-5..3]"
+                                 converterMessage="Введите число">
+                        <f:validateDoubleRange minimum="-5" maximum="3"/>
+                        <f:ajax render="Y-value-message"/>
+                    </h:inputText>
+                    <h:message for="Y-input" id="Y-value-message"/>
+                </div>
+                <div class="input-container" id="R-input-container">
+                    <p:outputLabel styleClass="form-label" for="@next" value="Выберите R:"/>
+                    <div class="input-area">
+                        <p:selectBooleanCheckbox id="rCheckbox1" value="#{pointHandler.checkboxesStorage.cb1}">
+                            <p:ajax listener="#{pointHandler.updateR('1')}" oncomplete="updateGraph()" update=":form:rCheckbox1 :form:rCheckbox1_5 :form:rCheckbox2 :form:rCheckbox2_5 :form:rCheckbox3" process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:outputLabel for="rCheckbox1" value="1"/>
+
+                        <p:selectBooleanCheckbox id="rCheckbox1_5" value="#{pointHandler.checkboxesStorage.cb2}">
+                            <p:ajax listener="#{pointHandler.updateR('1.5')}" oncomplete="updateGraph()" update=":form:rCheckbox1 :form:rCheckbox1_5 :form:rCheckbox2 :form:rCheckbox2_5 :form:rCheckbox3" process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:outputLabel for="rCheckbox1_5" value="1.5"/>
+
+                        <p:selectBooleanCheckbox id="rCheckbox2" value="#{pointHandler.checkboxesStorage.cb3}">
+                            <p:ajax listener="#{pointHandler.updateR('2')}" oncomplete="updateGraph()" update=":form:rCheckbox1 :form:rCheckbox1_5 :form:rCheckbox2 :form:rCheckbox2_5 :form:rCheckbox3" process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:outputLabel for="rCheckbox2" value="2"/>
+
+                        <p:selectBooleanCheckbox id="rCheckbox2_5" value="#{pointHandler.checkboxesStorage.cb4}">
+                            <p:ajax listener="#{pointHandler.updateR('2.5')}" oncomplete="updateGraph()" update=":form:rCheckbox1 :form:rCheckbox1_5 :form:rCheckbox2 :form:rCheckbox2_5 :form:rCheckbox3" process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:outputLabel for="rCheckbox2_5" value="2.5"/>
+
+                        <p:selectBooleanCheckbox id="rCheckbox3" value="#{pointHandler.checkboxesStorage.cb5}">
+                            <p:ajax listener="#{pointHandler.updateR('3')}" oncomplete="updateGraph()" update=":form:rCheckbox1 :form:rCheckbox1_5 :form:rCheckbox2 :form:rCheckbox2_5 :form:rCheckbox3" process="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:outputLabel for="rCheckbox3" value="3"/>
+                    </div>
+                </div>
+                <div class="input-container" id="buttons-container">
+                    <h:button value="Назад" styleClass="surfing-button main-button" outcome="go-to-index" id="go_to_index_button"/>
+                    <h:commandButton type="submit"
+                                     id="clear"
+                                     styleClass="main-button"
+                                     value="Очистить"
+                                     action="#{pointHandler.clear()}"
+                                     update="table @form graphPanel"/>
+                    <h:commandButton type="submit"
+                                     id="check"
+                                     styleClass="main-button"
+                                     value="Проверить"
+                                     action="#{pointHandler.add()}"/>
+                </div>
+            </h:form>
+
+            <h:outputScript>
+                function validateForm() {
+                    var checkboxes = document.querySelectorAll('#form input[type="checkbox"]');
+                    var isChecked = false;
+
+                    checkboxes.forEach(function(checkbox) {
+                        if (checkbox.checked) {
+                            isChecked = true;
+                        }
+                    });
+
+                    if (!isChecked) {
+                        alert('Выберите хотя бы одно значение R');
+                        return false;
+                    }
+
+                    return true;
+                }
+            </h:outputScript>
+        </div>
+
+        <h:outputScript>
+            function updateDrawer() {
+                var maxR = #{pointHandler.maxSelectedR}; // Получаем максимальное значение R
+                console.log("Max R: " + maxR);
+                if (drawer &amp;&amp; typeof drawer.redrawAll === 'function') {
+                drawer.redrawAll(maxR); // Вызываем функцию redrawAll с максимальным значением
+                } else {
+                console.error("Drawer or redrawAll is not defined");
+                }
+            }
+        </h:outputScript>
+        <div id="graph-container">
+            <canvas id="graph" width="300" height="300"/>
+        </div>
+        <div class="table-container">
+            <h:dataTable id="table" styleClass="main-table" value="#{pointHandler.points}" var="point" >
+                <p:remoteCommand name=""/>
+                <h:column>
+                    <f:facet name="header">X</f:facet>
+                    <h:outputText id="x" value="#{point.x}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Y</f:facet>
+                    <h:outputText id="y" value="#{point.y}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">R</f:facet>
+                    <h:outputText id="r" value="#{point.r}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Результат</f:facet>
+                    <h:outputText styleClass="#{point.status}" id="status" value="#{point.statusString}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Текущее время</f:facet>
+                    <h:outputText id="time" value="#{point.time}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Время работы (мкс)</f:facet>
+                    <h:outputText id="script-time" value="#{point.scriptTime}"/>
+                </h:column>
+            </h:dataTable>
+        </div>
+    </div>
+
+    <p:remoteCommand name="addAttempt" action="#{pointHandler.addFromJS()}" update="table" process="@this"/>
+    <p:remoteCommand name="updateGraph" update="graphPanel" process="@this"/>
+    <p:remoteCommand name="checkUpdate" action="#{pointHandler.loadPointsFromDb()}" update="table" process="@this"/>
+
+    <h:panelGroup id="graphPanel">
+        <h:outputScript>
+            if (drawer &amp;&amp; typeof drawer.redrawAll === 'function') {
+                var maxR = #{pointHandler.maxSelectedR}; // Получаем максимальное значение R
+                console.log("Max R: " + maxR);
+                drawer.redrawAll(maxR); // Вызываем функцию redrawAll с максимальным значением
+            }
+        </h:outputScript>
+    </h:panelGroup>
+</h:body>
+</html>
