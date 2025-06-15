@@ -40,6 +40,8 @@ public class PointHandler implements Serializable {
         MBeanRegistry.unregisterBean(statsMBean);
         MBeanRegistry.unregisterBean(areaResult);
     }
+    public void loadPointsFromDb(){
+    }
 
     public void updateR(String rValue) {
         checkboxesStorage.updateCb(rValue);
